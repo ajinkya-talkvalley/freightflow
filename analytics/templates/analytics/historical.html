@@ -1,0 +1,50 @@
+{% extends 'shipments/base.html' %}
+{% block title %}Historical analytics · FreightFlow{% endblock %}
+{% block content %}
+<h1 class="h3 mb-3">Historical analytics</h1>
+
+{% if not configured %}
+    <div class="alert alert-warning">
+        <strong>Athena not configured.</strong>
+        Set <code>ATHENA_DATABASE</code>, <code>ATHENA_OUTPUT_LOCATION</code>,
+        and (optionally) <code>ATHENA_WORKGROUP</code> in <code>.env</code>, then restart the server.
+    </div>
+{% else %}
+    <form method="get" class="row g-2 mb-3">
+        <div class="col-md-8">
+            <select name="q" class="form-select">
+                <option value="">— pick a canned query —</option>
+                {% for key, label in canned %}
+                    <option value="{{ key }}" {% if selected == key %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2"><button type="submit" class="btn btn-primary w-100">Run</button></div>
+    </form>
+
+    {% if sql %}
+        <h2 class="h6">SQL</h2>
+        <pre class="bg-light p-3 small"><code>{{ sql }}</code></pre>
+    {% endif %}
+
+    {% if error %}
+        <div class="alert alert-danger"><strong>Query failed:</strong> {{ error }}</div>
+    {% endif %}
+
+    {% if columns %}
+        <h2 class="h6">Results ({{ rows|length }} rows)</h2>
+        <div class="table-responsive">
+            <table class="table table-sm table-striped">
+                <thead><tr>{% for c in columns %}<th>{{ c }}</th>{% endfor %}</tr></thead>
+                <tbody>
+                    {% for r in rows %}
+                        <tr>{% for cell in r %}<td>{{ cell }}</td>{% endfor %}</tr>
+                    {% empty %}
+                        <tr><td colspan="{{ columns|length }}" class="text-center text-muted">No rows returned.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+{% endif %}
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends 'shipments/base.html' %}
+{% block title %}AI assistant · FreightFlow{% endblock %}
+{% block content %}
+<h1 class="h3 mb-3">AI assistant</h1>
+<p class="text-muted">Ask a question in plain English. Bedrock generates SQL against the historical shipments dataset; the SQL is validated as <code>SELECT</code>-only before running on Athena (30 s timeout).</p>
+
+{% if not bedrock_ready %}
+    <div class="alert alert-warning"><strong>Bedrock not configured.</strong> Set <code>BEDROCK_MODEL_ID</code> and <code>BEDROCK_REGION</code> in <code>.env</code>.</div>
+{% else %}
+    <form method="post" class="mb-3">
+        {% csrf_token %}
+        <div class="mb-2">
+            <textarea name="question" rows="3" class="form-control" placeholder="e.g. Which origin city has the highest average delay in days for delivered shipments?">{{ question }}</textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Ask</button>
+    </form>
+
+    {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+
+    {% if sql %}
+        <h2 class="h6">Generated SQL</h2>
+        <pre class="bg-light p-3 small"><code>{{ sql }}</code></pre>
+    {% endif %}
+
+    {% if columns %}
+        <h2 class="h6">Results ({{ rows|length }} rows)</h2>
+        <div class="table-responsive">
+            <table class="table table-sm table-striped">
+                <thead><tr>{% for c in columns %}<th>{{ c }}</th>{% endfor %}</tr></thead>
+                <tbody>
+                    {% for r in rows %}
+                        <tr>{% for cell in r %}<td>{{ cell }}</td>{% endfor %}</tr>
+                    {% empty %}
+                        <tr><td colspan="{{ columns|length }}" class="text-center text-muted">No rows returned.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+{% endif %}
+{% endblock %}

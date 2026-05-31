@@ -1,0 +1,54 @@
+{% extends 'shipments/base.html' %}
+{% block title %}Shipments · FreightFlow{% endblock %}
+{% block content %}
+<h1 class="h3 mb-3">Shipments</h1>
+
+<form method="get" class="row g-2 mb-3">
+    <div class="col-md-5">{{ form.q }}</div>
+    <div class="col-md-3">{{ form.status }}</div>
+    <div class="col-md-2"><button type="submit" class="btn btn-primary w-100">Filter</button></div>
+    <div class="col-md-2"><a href="{% url 'shipments:shipment_list' %}" class="btn btn-outline-secondary w-100">Reset</a></div>
+</form>
+
+<div class="table-responsive">
+    <table class="table table-sm table-hover">
+        <thead>
+            <tr>
+                <th>Tracking</th><th>Status</th><th>Origin</th><th>Destination</th>
+                <th>Shipped</th><th>ETA</th><th>Actual</th><th>Weight (kg)</th><th>Pieces</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for s in page %}
+            <tr{% if s.is_delayed %} class="table-warning"{% endif %}>
+                <td><a href="{% url 'shipments:shipment_detail' s.tracking_number %}">{{ s.tracking_number }}</a></td>
+                <td>{{ s.get_status_display }}</td>
+                <td>{{ s.origin_city }}</td>
+                <td>{{ s.destination_city }}</td>
+                <td>{{ s.shipment_date|date:'Y-m-d' }}</td>
+                <td>{{ s.estimated_delivery|date:'Y-m-d' }}</td>
+                <td>{{ s.actual_delivery|date:'Y-m-d'|default:'—' }}</td>
+                <td>{{ s.weight_kg }}</td>
+                <td>{{ s.pieces }}</td>
+            </tr>
+        {% empty %}
+            <tr><td colspan="9" class="text-center text-muted">No shipments match the filter.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% if page.paginator.num_pages > 1 %}
+<nav>
+    <ul class="pagination">
+        {% if page.has_previous %}
+            <li class="page-item"><a class="page-link" href="?{% if form.q.value %}q={{ form.q.value }}&{% endif %}{% if form.status.value %}status={{ form.status.value }}&{% endif %}page={{ page.previous_page_number }}">Previous</a></li>
+        {% endif %}
+        <li class="page-item active"><span class="page-link">Page {{ page.number }} of {{ page.paginator.num_pages }}</span></li>
+        {% if page.has_next %}
+            <li class="page-item"><a class="page-link" href="?{% if form.q.value %}q={{ form.q.value }}&{% endif %}{% if form.status.value %}status={{ form.status.value }}&{% endif %}page={{ page.next_page_number }}">Next</a></li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endblock %}

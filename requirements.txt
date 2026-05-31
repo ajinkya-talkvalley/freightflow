@@ -1,0 +1,11 @@
+Django>=5.0,<6.0
+django-storages[boto3]
+psycopg2-binary
+boto3
+python-decouple
+gunicorn
+Pillow
+requests
+faker
+dj-database-url
+sqlparse

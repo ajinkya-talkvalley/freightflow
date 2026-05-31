@@ -1,0 +1,44 @@
+{% extends 'shipments/base.html' %}
+{% block title %}Dashboard · FreightFlow{% endblock %}
+{% block content %}
+<h1 class="h3 mb-4">Operations dashboard</h1>
+
+<div class="row g-3 mb-4">
+    {% for label, key, color in kpis %}{% endfor %}
+    <div class="col-md-3"><div class="card text-bg-secondary"><div class="card-body"><div class="small">Total shipments</div><div class="display-6">{{ counts.total }}</div></div></div></div>
+    <div class="col-md-3"><div class="card text-bg-primary"><div class="card-body"><div class="small">In transit</div><div class="display-6">{{ counts.in_transit }}</div></div></div></div>
+    <div class="col-md-3"><div class="card text-bg-info"><div class="card-body"><div class="small">Out for delivery</div><div class="display-6">{{ counts.out_for_delivery }}</div></div></div></div>
+    <div class="col-md-3"><div class="card text-bg-success"><div class="card-body"><div class="small">Delivered today</div><div class="display-6">{{ counts.delivered_today }}</div></div></div></div>
+    <div class="col-md-3"><div class="card text-bg-warning"><div class="card-body"><div class="small">Delayed</div><div class="display-6">{{ counts.delayed }}</div></div></div></div>
+    <div class="col-md-3"><div class="card text-bg-light"><div class="card-body"><div class="small">Pending</div><div class="display-6">{{ counts.pending }}</div></div></div></div>
+    <div class="col-md-3"><div class="card text-bg-danger"><div class="card-body"><div class="small">Cancelled</div><div class="display-6">{{ counts.cancelled }}</div></div></div></div>
+</div>
+
+<h2 class="h5">Recent shipments</h2>
+<div class="table-responsive">
+    <table class="table table-sm table-striped">
+        <thead>
+            <tr>
+                <th>Tracking</th><th>Status</th><th>Origin</th><th>Destination</th>
+                <th>Shipped</th><th>ETA</th><th>Driver</th><th>Route</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for s in recent %}
+            <tr>
+                <td><a href="{% url 'shipments:shipment_detail' s.tracking_number %}">{{ s.tracking_number }}</a></td>
+                <td><span class="badge text-bg-secondary">{{ s.get_status_display }}</span></td>
+                <td>{{ s.origin_city }}</td>
+                <td>{{ s.destination_city }}</td>
+                <td>{{ s.shipment_date|date:'Y-m-d' }}</td>
+                <td>{{ s.estimated_delivery|date:'Y-m-d' }}</td>
+                <td>{{ s.driver.employee_id|default:'—' }}</td>
+                <td>{{ s.route.route_code|default:'—' }}</td>
+            </tr>
+        {% empty %}
+            <tr><td colspan="8" class="text-center text-muted">No shipments yet. Run <code>python manage.py seed_demo_data</code>.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

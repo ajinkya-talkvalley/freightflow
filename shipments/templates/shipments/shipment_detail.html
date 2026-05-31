@@ -1,0 +1,41 @@
+{% extends 'shipments/base.html' %}
+{% block title %}{{ shipment.tracking_number }} · FreightFlow{% endblock %}
+{% block content %}
+<a href="{% url 'shipments:shipment_list' %}" class="btn btn-sm btn-outline-secondary mb-3">← Back to shipments</a>
+
+<div class="row">
+    <div class="col-lg-8">
+        <h1 class="h3 mb-3">{{ shipment.tracking_number }}</h1>
+        <table class="table">
+            <tbody>
+                <tr><th style="width: 220px;">Status</th><td><span class="badge text-bg-primary">{{ shipment.get_status_display }}</span>{% if shipment.is_delayed %} <span class="badge text-bg-warning">Delayed</span>{% endif %}</td></tr>
+                <tr><th>Origin</th><td>{{ shipment.origin_city }}</td></tr>
+                <tr><th>Destination</th><td>{{ shipment.destination_city }}</td></tr>
+                <tr><th>Weight</th><td>{{ shipment.weight_kg }} kg</td></tr>
+                <tr><th>Pieces</th><td>{{ shipment.pieces }}</td></tr>
+                <tr><th>Shipment date</th><td>{{ shipment.shipment_date|date:'Y-m-d' }}</td></tr>
+                <tr><th>Estimated delivery</th><td>{{ shipment.estimated_delivery|date:'Y-m-d' }}</td></tr>
+                <tr><th>Actual delivery</th><td>{{ shipment.actual_delivery|date:'Y-m-d'|default:'—' }}</td></tr>
+                <tr><th>Customer email</th><td>{{ shipment.customer_email }}</td></tr>
+                <tr><th>Driver</th><td>{% if shipment.driver %}{{ shipment.driver.employee_id }} — {{ shipment.driver.full_name }}{% else %}—{% endif %}</td></tr>
+                <tr><th>Route</th><td>{% if shipment.route %}{{ shipment.route.route_code }} ({{ shipment.route.origin_city }} → {{ shipment.route.destination_city }}){% else %}—{% endif %}</td></tr>
+                <tr><th>Carrier tracking #</th><td>{{ shipment.carrier_tracking_number|default:'—' }}</td></tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="col-lg-4">
+        <h2 class="h5">Proof of delivery</h2>
+        {% if shipment.proof_of_delivery %}
+            <div class="card">
+                <img src="{{ MEDIA_URL }}{{ shipment.proof_of_delivery }}" alt="POD for {{ shipment.tracking_number }}" class="card-img-top" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <div class="card-body" style="display:none;">
+                    <p class="card-text small text-muted">POD reference: <code>{{ shipment.proof_of_delivery }}</code><br>
+                    Image not present in local media folder (POD assets are in <code>freightflow-assets.zip</code>).</p>
+                </div>
+            </div>
+        {% else %}
+            <p class="text-muted">No proof of delivery uploaded.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

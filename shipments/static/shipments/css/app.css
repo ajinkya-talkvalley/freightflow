@@ -1,0 +1,5 @@
+/* FreightFlow custom styles (Bootstrap 5 base) */
+body { padding-bottom: 2rem; }
+.card .display-6 { font-size: 2.2rem; }
+.table thead th { white-space: nowrap; }
+code { font-size: 0.875em; }
