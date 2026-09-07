@@ -58,6 +58,13 @@ Open <http://localhost:8000/> for the dashboard. Other pages:
 | `/ai/`         | AI assistant (Bedrock NL → SQL → Athena)               |
 | `/admin/`      | Django admin                                           |
 
+### Default Admin Credentials
+
+| Field    | Value      |
+|----------|------------|
+| Username | `admin`    |
+| Password | `admin123` |
+
 Pages that depend on unconfigured AWS env vars (Athena, Bedrock) show a
 friendly "not configured" banner instead of crashing.
 
